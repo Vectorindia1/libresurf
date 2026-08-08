@@ -1,0 +1,94 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  # ─── TypeScript lint + format ─────────────────────────────────────────────
+  typescript-checks:
+    name: TypeScript Lint & Format
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Format check
+        run: npm run format:check
+
+      - name: TypeScript build
+        run: npm run build
+
+      - name: TypeScript tests
+        run: npm test
+
+  # ─── C++ build + unit tests (Linux) ──────────────────────────────────────
+  cpp-linux:
+    name: C++ Build & Test (Linux)
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            cmake ninja-build clang clang-format \
+            libgtk-3-dev libx11-dev libxcomposite-dev \
+            libxdamage-dev libxrandr-dev libxss-dev \
+            libnss3-dev libatk1.0-dev libatk-bridge2.0-dev \
+            libcups2-dev libdrm-dev libgbm-dev
+
+      - name: Check clang-format
+        run: |
+          find . -name "*.cpp" -o -name "*.h" | \
+          grep -v build | grep -v engine/cef/Release | \
+          xargs clang-format --dry-run --Werror
+
+      - name: Configure (without CEF — stub build)
+        run: |
+          cmake -B build \
+            -G Ninja \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DBUILD_TESTS=ON
+
+      - name: Build
+        run: cmake --build build --parallel
+
+      - name: Run unit tests
+        run: ctest --test-dir build --output-on-failure
+
+  # ─── C++ build (Windows) ─────────────────────────────────────────────────
+  cpp-windows:
+    name: C++ Build (Windows)
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Configure (stub build)
+        run: |
+          cmake -B build `
+            -DCMAKE_BUILD_TYPE=Debug `
+            -DBUILD_TESTS=ON
+
+      - name: Build
+        run: cmake --build build --config Debug --parallel
+
+      - name: Run unit tests
+        run: ctest --test-dir build -C Debug --output-on-failure
