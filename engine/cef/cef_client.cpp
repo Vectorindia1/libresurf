@@ -4,6 +4,7 @@
 
 #include "include/cef_app.h"
 #include "include/wrapper/cef_helpers.h"
+#include "core/downloads/download_manager.h"
 
 namespace libresurf {
 
@@ -88,16 +89,14 @@ void LibreSurfClient::OnBeforeDownload(CefRefPtr<CefBrowser> browser,
                                         const CefString& suggested_name,
                                         CefRefPtr<CefBeforeDownloadCallback> callback) {
     CEF_REQUIRE_UI_THREAD();
-    // Notify download manager → show download bar.
-    // DownloadManager::instance().onBeforeDownload(download_item, suggested_name, callback);
-    callback->Continue(suggested_name, true);  // show save dialog
+    DownloadManager::instance().onBeforeDownload(download_item, suggested_name, callback);
 }
 
 void LibreSurfClient::OnDownloadUpdated(CefRefPtr<CefBrowser> browser,
                                          CefRefPtr<CefDownloadItem> download_item,
                                          CefRefPtr<CefDownloadItemCallback> callback) {
     CEF_REQUIRE_UI_THREAD();
-    // DownloadManager::instance().onDownloadUpdated(download_item, callback);
+    DownloadManager::instance().onDownloadUpdated(download_item, callback);
 }
 
 }  // namespace libresurf
