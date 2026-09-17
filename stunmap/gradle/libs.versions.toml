@@ -17,6 +17,9 @@ coroutines = "1.8.1"
 lifecycle = "2.8.4"
 junit = "4.13.2"
 espresso = "3.5.1"
+mockk = "1.13.12"
+androidxTestCore = "1.5.0"
+androidxTestExtJunit = "1.1.5"
 datastore = "1.1.1"
 coreKtx = "1.13.1"
 
@@ -76,6 +79,11 @@ datastore-preferences = { group = "androidx.datastore", name = "datastore-prefer
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines" }
 espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espresso" }
+mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
+room-testing = { group = "androidx.room", name = "room-testing", version.ref = "room" }
+androidx-test-core = { group = "androidx.test", name = "core-ktx", version.ref = "androidxTestCore" }
+androidx-test-runner = { group = "androidx.test", name = "runner", version.ref = "androidxTestCore" }
+androidx-test-ext-junit = { group = "androidx.test.ext", name = "junit-ktx", version.ref = "androidxTestExtJunit" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
